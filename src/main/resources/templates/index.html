@@ -12,25 +12,35 @@
   <main>
     <h1>Kafka messages</h1>
 
-    <form id="message-form"
-        hx-post="/messages"
-        hx-target="#status"
-        hx-target-4*="#status"
-        hx-target-5*="#status"
-        hx-swap="innerHTML"
-        hx-ext="response-targets"
-        hx-on::after-request="if (event.detail.successful) this.reset()">
-      <label for="message">Message</label>
-      <input id="message" name="message" type="text" required>
-      <label for="recipient">Send to</label>
-      <select id="recipient" name="recipient" required>
-        <option value="consumer1">consumer1</option>
-        <option value="consumer2">consumer2</option>
-        <option value="all" selected>all</option>
-      </select>
-      <button type="submit">Send message</button>
-    </form>
-    <p id="status" role="status" aria-live="polite"></p>
+    <section class="panel producer-panel" aria-labelledby="producer-heading">
+      <h2 id="producer-heading">Message producer</h2>
+      <form id="message-form"
+          class="producer-form"
+          hx-post="/messages"
+          hx-target="#status"
+          hx-target-4*="#status"
+          hx-target-5*="#status"
+          hx-swap="innerHTML"
+          hx-ext="response-targets"
+          hx-on::after-request="if (event.detail.successful) this.reset()">
+        <div class="producer-fields">
+          <div class="producer-field">
+            <label for="message">Message</label>
+            <input id="message" name="message" type="text" required>
+          </div>
+          <div class="producer-field">
+            <label for="recipient">Send to</label>
+            <select id="recipient" name="recipient" required>
+              <option value="consumer1">consumer1</option>
+              <option value="consumer2">consumer2</option>
+              <option value="all" selected>all</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit">Send message</button>
+      </form>
+      <p id="status" role="status" aria-live="polite"></p>
+    </section>
 
     <div class="message-lists">
       <section th:replace="~{fragments/message-list :: messageList('consumer1', 'Consumer 1', ${consumer1Messages}, '/messages/fragment', '/messages/replay', false)}"></section>

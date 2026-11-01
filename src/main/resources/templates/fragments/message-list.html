@@ -1,4 +1,4 @@
-<section th:fragment="messageList(consumerId, consumerName, messages, loadUrl, replayUrl, replayRequested)"
+<section class="panel" th:fragment="messageList(consumerId, consumerName, messages, loadUrl, replayUrl, replayRequested)"
     th:id="${consumerId + '-message-list'}"
     th:attr="aria-labelledby=${consumerId + '-received-heading'}">
   <h2 th:id="${consumerId + '-received-heading'}" th:text="${consumerName + ' messages'}">Received messages</h2>
