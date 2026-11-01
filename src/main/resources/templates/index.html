@@ -26,7 +26,10 @@
     </form>
     <p id="status" role="status" aria-live="polite"></p>
 
-    <section th:replace="~{fragments/message-list :: messageList}"></section>
+    <div class="message-lists">
+      <section th:replace="~{fragments/message-list :: messageList('consumer1', 'Consumer 1', ${consumer1Messages}, '/messages/fragment', '/messages/replay', false)}"></section>
+      <section th:replace="~{fragments/message-list :: messageList('consumer2', 'Consumer 2', ${consumer2Messages}, '/messages/consumer2/fragment', '/messages/consumer2/replay', false)}"></section>
+    </div>
   </main>
 </body>
 </html>

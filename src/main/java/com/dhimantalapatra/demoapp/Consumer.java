@@ -1,6 +1,7 @@
 package com.dhimantalapatra.demoapp;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -8,20 +9,19 @@ import java.util.concurrent.ConcurrentMap;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.ConsumerSeekAware;
-import org.springframework.stereotype.Service;
 
-@Service
-public class Consumer implements ConsumerSeekAware {
+public abstract class Consumer implements ConsumerSeekAware {
 
-  private static final Logger logger = LoggerFactory.getLogger(Consumer.class);
+  private final Logger logger = LoggerFactory.getLogger(getClass());
   private final MessageStore messageStore;
+  private final String id;
   private final ConcurrentMap<TopicPartition, ConsumerSeekCallback> seekCallbacks = new ConcurrentHashMap<>();
   private final ThreadLocal<ConsumerSeekCallback> callbackForThread = new ThreadLocal<>();
 
-  public Consumer(MessageStore messageStore) {
+  protected Consumer(MessageStore messageStore, String id) {
     this.messageStore = messageStore;
+    this.id = id;
   }
 
   @Override
@@ -44,22 +44,25 @@ public class Consumer implements ConsumerSeekAware {
     callbackForThread.remove();
   }
 
-  public void rewindToBeginning() {
+  public final void rewindToBeginning() {
     Map<TopicPartition, ConsumerSeekCallback> callbacks = Map.copyOf(seekCallbacks);
     if (callbacks.isEmpty()) {
       throw new IllegalStateException("Kafka consumer has no assigned partitions to rewind");
     }
 
-    messageStore.clear();
+    messageStore.clear(id);
     callbacks.forEach((topicPartition, callback) ->
         callback.seekToBeginning(topicPartition.topic(), topicPartition.partition()));
-    logger.info("Requested Kafka replay from the beginning of {} partitions", callbacks.size());
+    logger.info("Requested Kafka replay from the beginning of {} partitions for {}", callbacks.size(), id);
   }
 
-  @KafkaListener(id = "myConsumer", topics = "${app.kafka.topic}", groupId = "springboot-group-1", autoStartup = "true")
-  public void listen(String value) {
-    logger.info("Received message {}",value);
-    messageStore.add(value);
+  public final List<String> getMessages() {
+    return messageStore.getMessages(id);
+  }
+
+  protected final void receive(String value) {
+    logger.info("Received message {}", value);
+    messageStore.add(id, value);
     logger.info("Consumed event: value = {}", value);
   }
 }

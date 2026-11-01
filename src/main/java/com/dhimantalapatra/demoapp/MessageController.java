@@ -16,40 +16,57 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class MessageController {
 
-  private final MessageStore messageStore;
   private final Producer producer;
-  private final Consumer consumer;
+  private final Consumer1 consumer1;
+  private final Consumer2 consumer2;
 
-  public MessageController(MessageStore messageStore, Producer producer, Consumer consumer) {
-    this.messageStore = messageStore;
+  public MessageController(Producer producer, Consumer1 consumer1, Consumer2 consumer2) {
     this.producer = producer;
-    this.consumer = consumer;
+    this.consumer1 = consumer1;
+    this.consumer2 = consumer2;
   }
 
   @GetMapping("/")
   public String index(Model model) {
-    model.addAttribute("messages", messageStore.getMessages());
+    model.addAttribute("consumer1Messages", consumer1.getMessages());
+    model.addAttribute("consumer2Messages", consumer2.getMessages());
     return "index";
   }
 
   @GetMapping("/messages/fragment")
   public String messageList(Model model) {
-    model.addAttribute("messages", messageStore.getMessages());
-    return "fragments/message-list :: messageList";
+    return messageFragment(model, consumer1, Consumer1.ID, "Consumer 1", "/messages/fragment", "/messages/replay", false);
+  }
+
+  @GetMapping("/messages/consumer2/fragment")
+  public String consumer2MessageList(Model model) {
+    return messageFragment(model, consumer2, Consumer2.ID, "Consumer 2",
+        "/messages/consumer2/fragment", "/messages/consumer2/replay", false);
   }
 
   @PostMapping("/messages/replay")
   public String replayMessages(Model model) {
-    consumer.rewindToBeginning();
-    model.addAttribute("messages", messageStore.getMessages());
-    model.addAttribute("replayRequested", true);
-    return "fragments/message-list :: messageList";
+    consumer1.rewindToBeginning();
+    return messageFragment(model, consumer1, Consumer1.ID, "Consumer 1", "/messages/fragment", "/messages/replay", true);
+  }
+
+  @PostMapping("/messages/consumer2/replay")
+  public String replayConsumer2Messages(Model model) {
+    consumer2.rewindToBeginning();
+    return messageFragment(model, consumer2, Consumer2.ID, "Consumer 2",
+        "/messages/consumer2/fragment", "/messages/consumer2/replay", true);
   }
 
   @GetMapping("/messages")
   @ResponseBody
   public List<String> messages() {
-    return messageStore.getMessages();
+    return consumer1.getMessages();
+  }
+
+  @GetMapping("/messages/consumer2")
+  @ResponseBody
+  public List<String> consumer2Messages() {
+    return consumer2.getMessages();
   }
 
   @PostMapping(path = "/messages", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -65,5 +82,17 @@ public class MessageController {
         .thenApply(result -> ResponseEntity.status(HttpStatus.ACCEPTED)
             .contentType(MediaType.TEXT_PLAIN)
             .body("Message sent."));
+  }
+
+  private String messageFragment(Model model, Consumer consumer, String consumerId, String consumerName,
+      String loadUrl, String replayUrl, boolean replayRequested) {
+    model.addAttribute("consumerId", consumerId);
+    model.addAttribute("consumerName", consumerName);
+    model.addAttribute("messages", consumer.getMessages());
+    model.addAttribute("loadUrl", loadUrl);
+    model.addAttribute("replayUrl", replayUrl);
+    model.addAttribute("replayRequested", replayRequested);
+    return "fragments/message-list :: messageList(consumerId=${consumerId}, consumerName=${consumerName}, "
+        + "messages=${messages}, loadUrl=${loadUrl}, replayUrl=${replayUrl}, replayRequested=${replayRequested})";
   }
 }

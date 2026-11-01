@@ -1,0 +1,19 @@
+package com.dhimantalapatra.demoapp;
+
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Service;
+
+@Service
+public class Consumer1 extends Consumer {
+
+  public static final String ID = "consumer1";
+
+  public Consumer1(MessageStore messageStore) {
+    super(messageStore, ID);
+  }
+
+  @KafkaListener(id = ID, topics = "${app.kafka.topic}", groupId = "springboot-group-1", autoStartup = "true")
+  public void listen(String value) {
+    super.receive(value);
+  }
+}

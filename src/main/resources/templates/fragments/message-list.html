@@ -1,17 +1,17 @@
-<section th:fragment="messageList" id="message-list" aria-labelledby="received-heading">
-  <h2 id="received-heading">Received messages</h2>
+<section th:fragment="messageList(consumerId, consumerName, messages, loadUrl, replayUrl, replayRequested)"
+    th:id="${consumerId + '-message-list'}"
+    th:attr="aria-labelledby=${consumerId + '-received-heading'}">
+  <h2 th:id="${consumerId + '-received-heading'}" th:text="${consumerName + ' messages'}">Received messages</h2>
   <button type="button"
-      hx-get="/messages/fragment"
-      hx-target="#message-list"
+      th:attr="hx-get=${loadUrl}, hx-target=${'#' + consumerId + '-message-list'}"
       hx-swap="outerHTML">Load Messages</button>
   <button type="button"
-      hx-post="/messages/replay"
-      hx-target="#message-list"
+      th:attr="hx-post=${replayUrl}, hx-target=${'#' + consumerId + '-message-list'}"
       hx-swap="outerHTML">Rewind</button>
   <p th:if="${replayRequested}" role="status">
-    Rewind requested. Wait for the consumer to replay the retained messages, then click Load Messages.
+    Rewind requested. Wait for this consumer to replay the retained messages, then click Load Messages.
   </p>
-  <ul id="messages">
+  <ul th:id="${consumerId + '-messages'}">
     <li th:each="message : ${messages}">
       <pre th:text="${message}"></pre>
     </li>
