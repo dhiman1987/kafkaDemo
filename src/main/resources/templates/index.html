@@ -20,8 +20,14 @@
         hx-swap="innerHTML"
         hx-ext="response-targets"
         hx-on::after-request="if (event.detail.successful) this.reset()">
-      <label for="message">Message (JSON)</label>
-      <textarea id="message" name="message" rows="8" required></textarea>
+      <label for="message">Message</label>
+      <input id="message" name="message" type="text" required>
+      <label for="recipient">Send to</label>
+      <select id="recipient" name="recipient" required>
+        <option value="consumer1">consumer1</option>
+        <option value="consumer2">consumer2</option>
+        <option value="all" selected>all</option>
+      </select>
       <button type="submit">Send message</button>
     </form>
     <p id="status" role="status" aria-live="polite"></p>

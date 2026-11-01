@@ -1,6 +1,7 @@
 package com.dhimantalapatra.demoapp;
 
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,7 +14,7 @@ public class Consumer1 extends Consumer {
   }
 
   @KafkaListener(id = ID, topics = "${app.kafka.topic}", groupId = "springboot-group-1", autoStartup = "true")
-  public void listen(String value) {
-    super.receive(value);
+  public void listen(String value, @Header(name = MessageRecipient.HEADER_NAME, required = false) byte[] recipient) {
+    receive(value, recipient);
   }
 }

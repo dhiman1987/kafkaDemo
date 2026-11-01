@@ -31,7 +31,9 @@ class DemoappApplicationTests {
 				.andExpect(status().isOk())
 				.andExpect(content().string(containsString("consumer1-message-list")))
 				.andExpect(content().string(containsString("consumer2-message-list")))
-				.andExpect(content().string(containsString("hx-get=\"/messages/consumer2/fragment\"")));
+				.andExpect(content().string(containsString("hx-get=\"/messages/consumer2/fragment\"")))
+				.andExpect(content().string(containsString("<input id=\"message\" name=\"message\" type=\"text\" required>")))
+				.andExpect(content().string(containsString("<option value=\"all\" selected>all</option>")));
 	}
 
 	@Test

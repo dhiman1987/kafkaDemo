@@ -3,6 +3,7 @@ package com.dhimantalapatra.demoapp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -60,7 +61,16 @@ public abstract class Consumer implements ConsumerSeekAware {
     return messageStore.getMessages(id);
   }
 
-  protected final void receive(String value) {
+  protected final void receive(String value, byte[] recipientHeader) {
+    Optional<MessageRecipient> recipient = MessageRecipient.fromHeader(recipientHeader);
+    if (recipient.isEmpty()) {
+      logger.warn("Skipping message without a valid {} header", MessageRecipient.HEADER_NAME);
+      return;
+    }
+    if (!recipient.get().includes(id)) {
+      return;
+    }
+
     logger.info("Received message {}", value);
     messageStore.add(id, value);
     logger.info("Consumed event: value = {}", value);

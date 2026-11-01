@@ -1,6 +1,7 @@
 package com.dhimantalapatra.demoapp;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;
@@ -71,14 +72,22 @@ public class MessageController {
 
   @PostMapping(path = "/messages", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   @ResponseBody
-  public CompletableFuture<ResponseEntity<String>> sendMessage(@RequestParam String message) {
+  public CompletableFuture<ResponseEntity<String>> sendMessage(
+      @RequestParam String message, @RequestParam String recipient) {
     if (message.isBlank()) {
       return CompletableFuture.completedFuture(ResponseEntity.badRequest()
           .contentType(MediaType.TEXT_PLAIN)
           .body("Enter a message before sending."));
     }
 
-    return producer.sendMessage(null, message)
+    MessageRecipient selectedRecipient = MessageRecipient.fromValue(recipient).orElse(null);
+    if (selectedRecipient == null) {
+      return CompletableFuture.completedFuture(ResponseEntity.badRequest()
+          .contentType(MediaType.TEXT_PLAIN)
+          .body("Select consumer1, consumer2, or all."));
+    }
+
+    return producer.sendMessage(UUID.randomUUID().toString(), message, selectedRecipient)
         .thenApply(result -> ResponseEntity.status(HttpStatus.ACCEPTED)
             .contentType(MediaType.TEXT_PLAIN)
             .body("Message sent."));

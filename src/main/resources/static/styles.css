@@ -12,10 +12,10 @@ form {
   gap: 0.5rem;
 }
 
-textarea {
+input,
+select {
   box-sizing: border-box;
   width: 100%;
-  font-family: monospace;
 }
 
 button {
