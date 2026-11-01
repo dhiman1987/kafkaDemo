@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kafka message sender</title>
+  <link rel="stylesheet" th:href="@{/styles.css}">
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+  <main>
+    <h1>Kafka messages</h1>
+
+    <form id="message-form">
+      <label for="message">Message (JSON)</label>
+      <textarea id="message" name="message" rows="8" required></textarea>
+      <button type="submit">Send message</button>
+    </form>
+    <p id="status" role="status" aria-live="polite"></p>
+
+    <section th:replace="~{fragments/message-list :: messageList}"></section>
+  </main>
+
+  <script>
+    const form = document.getElementById("message-form");
+    const messageInput = document.getElementById("message");
+    const status = document.getElementById("status");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      status.textContent = "Sending...";
+
+      try {
+        const response = await fetch("/messages", {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          body: messageInput.value
+        });
+        if (!response.ok) {
+          throw new Error(response.status === 400
+            ? "Enter a message before sending."
+            : "Could not send the message.");
+        }
+
+        messageInput.value = "";
+        status.textContent = "Message sent.";
+      } catch (error) {
+        status.textContent = error.message;
+      }
+    });
+  </script>
+</body>
+</html>

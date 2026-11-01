@@ -1,0 +1,28 @@
+body {
+  margin: 2rem;
+  font-family: sans-serif;
+}
+
+main {
+  max-width: 40rem;
+}
+
+form {
+  display: grid;
+  gap: 0.5rem;
+}
+
+textarea {
+  box-sizing: border-box;
+  width: 100%;
+  font-family: monospace;
+}
+
+button {
+  justify-self: start;
+}
+
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
