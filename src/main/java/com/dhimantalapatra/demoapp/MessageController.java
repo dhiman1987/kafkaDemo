@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,17 +21,21 @@ public class MessageController {
   private final Producer producer;
   private final Consumer1 consumer1;
   private final Consumer2 consumer2;
+  private final String kafkaTopic;
 
-  public MessageController(Producer producer, Consumer1 consumer1, Consumer2 consumer2) {
+  public MessageController(Producer producer, Consumer1 consumer1, Consumer2 consumer2,
+      @Value("${app.kafka.topic}") String kafkaTopic) {
     this.producer = producer;
     this.consumer1 = consumer1;
     this.consumer2 = consumer2;
+    this.kafkaTopic = kafkaTopic;
   }
 
   @GetMapping("/")
   public String index(Model model) {
     model.addAttribute("consumer1Messages", consumer1.getMessages());
     model.addAttribute("consumer2Messages", consumer2.getMessages());
+    model.addAttribute("kafkaTopic", kafkaTopic);
     return "index";
   }
 

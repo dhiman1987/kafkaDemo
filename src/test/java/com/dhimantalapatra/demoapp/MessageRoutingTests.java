@@ -71,7 +71,7 @@ class MessageRoutingTests {
     when(producer.sendMessage(anyString(), eq("hello"), eq(MessageRecipient.CONSUMER1))).thenReturn(sendResult);
     MessageStore messageStore = new MessageStore();
     MessageController controller = new MessageController(
-        producer, new Consumer1(messageStore), new Consumer2(messageStore));
+        producer, new Consumer1(messageStore), new Consumer2(messageStore), "test-topic");
 
     controller.sendMessage("hello", "consumer1").get(1, TimeUnit.SECONDS);
 

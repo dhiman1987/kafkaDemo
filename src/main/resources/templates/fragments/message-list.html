@@ -1,19 +1,38 @@
-<section class="panel" th:fragment="messageList(consumerId, consumerName, messages, loadUrl, replayUrl, replayRequested)"
+<section class="consumer-panel"
+    th:fragment="messageList(consumerId, consumerName, messages, loadUrl, replayUrl, replayRequested)"
     th:id="${consumerId + '-message-list'}"
     th:attr="aria-labelledby=${consumerId + '-received-heading'}, hx-get=${loadUrl}"
     hx-trigger="every 1s"
     hx-target="this"
     hx-swap="outerHTML">
-  <h2 th:id="${consumerId + '-received-heading'}" th:text="${consumerName + ' messages'}">Received messages</h2>
-  <button type="button"
-      th:attr="hx-post=${replayUrl}, hx-target=${'#' + consumerId + '-message-list'}"
-      hx-swap="outerHTML">Rewind</button>
-  <p th:if="${replayRequested}" role="status">
+  <div class="consumer-heading">
+    <div class="panel-title">
+      <span class="material-symbols-outlined consumer-icon" aria-hidden="true">terminal</span>
+      <h2 th:id="${consumerId + '-received-heading'}" th:text="${consumerName + ' messages'}">Consumer messages</h2>
+    </div>
+    <div class="consumer-actions">
+      <span class="listening-badge"><span class="status-dot" aria-hidden="true"></span>Listening</span>
+      <button class="rewind-button" type="button"
+          th:attr="hx-post=${replayUrl}, hx-target=${'#' + consumerId + '-message-list'}"
+          hx-swap="outerHTML"
+          title="Rewind to beginning">
+        <span class="material-symbols-outlined" aria-hidden="true">fast_rewind</span>
+        Rewind
+      </button>
+    </div>
+  </div>
+  <p class="replay-notice" th:if="${replayRequested}" role="status">
     Rewind requested. Messages will update automatically as this consumer replays the retained messages.
   </p>
-  <ul th:id="${consumerId + '-messages'}">
-    <li th:each="message : ${messages}">
-      <pre th:text="${message}"></pre>
+  <ul class="message-stream" th:id="${consumerId + '-messages'}">
+    <li class="message-row" th:each="message, messageStat : ${messages}">
+      <span class="message-payload" th:text="${message}"></span>
+      <span class="message-index" th:text="${#numbers.formatInteger(messageStat.count, 2)}">01</span>
     </li>
+    <li class="empty-state" th:if="${#lists.isEmpty(messages)}">No messages in buffer yet.</li>
   </ul>
+  <div class="consumer-footer">
+    <span th:text="${#lists.size(messages)} + ' messages in buffer'">0 messages in buffer</span>
+    <span class="auto-refresh-label"><span class="status-dot" aria-hidden="true"></span>Auto-refresh ON</span>
+  </div>
 </section>

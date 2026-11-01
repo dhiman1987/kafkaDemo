@@ -33,9 +33,12 @@ class DemoappApplicationTests {
 				.andExpect(content().string(containsString("consumer2-message-list")))
 				.andExpect(content().string(containsString("hx-get=\"/messages/consumer2/fragment\"")))
 				.andExpect(content().string(containsString("hx-trigger=\"every 1s\"")))
+				.andExpect(content().string(containsString("Stream Workbench")))
+				.andExpect(content().string(containsString("thermostat_readings")))
+				.andExpect(content().string(containsString("hx-post=\"/messages\"")))
 				.andExpect(content().string(org.hamcrest.Matchers.not(containsString("Load Messages"))))
-				.andExpect(content().string(containsString("<input id=\"message\" name=\"message\" type=\"text\" required>")))
-				.andExpect(content().string(containsString("<option value=\"all\" selected>all</option>")));
+				.andExpect(content().string(containsString("id=\"message\" name=\"message\" type=\"text\"")))
+				.andExpect(content().string(containsString("<option value=\"all\" selected>")));
 	}
 
 	@Test
