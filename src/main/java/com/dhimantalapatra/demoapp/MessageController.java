@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
@@ -52,14 +52,18 @@ public class MessageController {
     return messageStore.getMessages();
   }
 
-  @PostMapping(path = "/messages", consumes = MediaType.TEXT_PLAIN_VALUE)
+  @PostMapping(path = "/messages", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   @ResponseBody
-  public CompletableFuture<ResponseEntity<Void>> sendMessage(@RequestBody String message) {
+  public CompletableFuture<ResponseEntity<String>> sendMessage(@RequestParam String message) {
     if (message.isBlank()) {
-      return CompletableFuture.completedFuture(ResponseEntity.badRequest().build());
+      return CompletableFuture.completedFuture(ResponseEntity.badRequest()
+          .contentType(MediaType.TEXT_PLAIN)
+          .body("Enter a message before sending."));
     }
 
     return producer.sendMessage(null, message)
-        .thenApply(result -> ResponseEntity.status(HttpStatus.ACCEPTED).build());
+        .thenApply(result -> ResponseEntity.status(HttpStatus.ACCEPTED)
+            .contentType(MediaType.TEXT_PLAIN)
+            .body("Message sent."));
   }
 }
