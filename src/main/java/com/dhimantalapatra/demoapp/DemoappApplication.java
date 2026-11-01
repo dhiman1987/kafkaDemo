@@ -22,7 +22,4 @@ public class DemoappApplication {
 	SpringApplication application = new SpringApplication(DemoappApplication.class);
     application.run(args);
   }
-
-  @Autowired
-  private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 }
